@@ -1,9 +1,10 @@
 const Joi = require('joi');
-const {messages,statusCode} = require('../constants.json');
+const {messages,statusCode} = require('../messages.json');
+const {TRADE_TYPES} = require('../constants');
 
 const allSchemas = {
     addTradeSchema : Joi.object().keys({
-        type:Joi.string().trim().required().valid('buy','sell'),
+        type:Joi.string().trim().required().valid(...TRADE_TYPES),
         ticker:Joi.string().trim().required(),
         quantity:Joi.number().required().greater(0),
         price:Joi.number().required().greater(0),
