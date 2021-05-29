@@ -11,7 +11,8 @@
         "INVALID_QUANTITY":"Invalid quantity",
         "INVALID_TRADE":"Invalid Trade",
         "PRICE_SHOULD_GREATER_THAN_0":"Price should be greater than zero",
-        "MODIFY_LAST_TRADE":"Can modify only last trade"
+        "MODIFY_LAST_TRADE":"Can modify only last trade",
+        "NO_HOLDINGS":"You do not hold any securities at the moment"
     },
     "statusCode": {
         "OK": 200,

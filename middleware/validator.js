@@ -6,15 +6,15 @@ const allSchemas = {
     addTradeSchema : Joi.object().keys({
         type:Joi.string().trim().required().valid(...TRADE_TYPES),
         ticker:Joi.string().trim().required(),
-        quantity:Joi.number().required().greater(0),
+        quantity:Joi.number().integer().required().greater(0),
         price:Joi.number().required().greater(0)
-    }),
+    }).strict(),
     updateTradeSchema : Joi.object().keys({
         type:Joi.string().trim().valid(...TRADE_TYPES),
         ticker:Joi.string().trim(),
-        quantity:Joi.number().greater(0),
+        quantity:Joi.number().integer().greater(0),
         price:Joi.number().greater(0)
-    })
+    }).strict()
 }
 
 module.exports = function inputValidator(schemaName){

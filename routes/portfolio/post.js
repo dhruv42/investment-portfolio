@@ -3,7 +3,8 @@ const Portfolio = require('../../models/portfolio');
 const {messages,statusCode} = require('../../messages.json');
 const {
     doAverage,calculateTotalPrice,
-    checkIfTheLatestTrade,revertTrade,settlePortfolio
+    checkIfTheLatestTrade,revertTrade,settlePortfolio,
+    calculateTotalInvestment
 } = require('../../common/common');
 const {BUY,SELL} = require('../../constants');
 
@@ -40,7 +41,7 @@ const addTrade = async (req,res) => {
 
         //if no security found
         if(Object.keys(securityObj).length === 0) {
-            if(type === SELL){ //can not sell before sell
+            if(type === SELL){ //can not sell before buying
                 return res.status(statusCode.INTERNAL_SERVER).json({
                     success:false,
                     error:true,
@@ -62,10 +63,14 @@ const addTrade = async (req,res) => {
 
         const tradePrice = calculateTotalPrice(price,quantity);
         securityObj.ticker = ticker;
-        securityObj.quantity = (securityObj.quantity || 0) + (tradeSign)*quantity ;
-        securityObj.totalPrice = (securityObj.totalPrice || 0) + (tradeSign)*calculateTotalPrice(price,quantity);
-        securityObj.avgPrice = doAverage(securityObj.totalPrice, securityObj.quantity);
-        portfolio.totalInvestment += (tradeSign)*tradePrice;
+        securityObj.quantity = (securityObj.quantity || 0) + (tradeSign)*quantity;
+        if(type === BUY){
+            securityObj.totalPrice = (securityObj.totalPrice || 0) + (tradeSign)*tradePrice;
+            securityObj.avgPrice = doAverage(securityObj.totalPrice, securityObj.quantity);
+        } else {
+            securityObj.totalPrice = calculateTotalPrice(securityObj.avgPrice,securityObj.quantity);
+        }
+        calculateTotalInvestment(portfolio);
         await Portfolio.updateOne({_id:portfolio._id},portfolio);
     }
 
@@ -73,7 +78,7 @@ const addTrade = async (req,res) => {
         portfolioId:portfolio._id,
         ...req.body
     });
-
+    
     return res.status(statusCode.OK).json({
         success:true,
         error:false,
@@ -155,10 +160,12 @@ const updateTrade = async (req,res) => {
                 success:false,
                 error:true,
                 message:messages.INVALID_QUANTITY
-            }); 
+            });
         }
         anotherSecurity.totalPrice += (tradeSign)*calculateTotalPrice(finalObject.price,finalObject.quantity);
-        anotherSecurity.avgPrice = doAverage(anotherSecurity.totalPrice,anotherSecurity.quantity);
+        if(finalObject.type === BUY){
+            anotherSecurity.avgPrice = doAverage(anotherSecurity.totalPrice,anotherSecurity.quantity);
+        }
         portfolio.securities[otherTickerIndex] = anotherSecurity;
     } else {
         updateSecurity.quantity += (tradeSign)*finalObject.quantity;
@@ -170,7 +177,9 @@ const updateTrade = async (req,res) => {
             }); 
         }
         updateSecurity.totalPrice += (tradeSign)*calculateTotalPrice(finalObject.price,finalObject.quantity);
-        updateSecurity.avgPrice = doAverage(updateSecurity.totalPrice,updateSecurity.quantity) || 0;
+        if(finalObject.type === BUY){
+            updateSecurity.avgPrice = doAverage(updateSecurity.totalPrice,updateSecurity.quantity) || 0;
+        }
     }
     portfolio.securities[index] = updateSecurity;
     settlePortfolio(portfolio);
@@ -213,7 +222,7 @@ const removeTrade = async (req,res) => {
             Portfolio.updateOne({_id:portfolio._id},portfolio)
         ]);
 
-        return res.status(statusCode.MODIFIED);
+        return res.status(statusCode.MODIFIED).json();
 
     } catch (error) {
         throw new Error(error.message);

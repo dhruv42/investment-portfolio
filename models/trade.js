@@ -20,13 +20,13 @@ const trade = mongoose.Schema({
     portfolioId:{
         type:String,
         required:true
-    },
-    tradeTime:{
-        type:String,
-        default:new Date().toISOString()
     }
 },{
-    versionKey:false
+    versionKey:false,
+    timestamps:{
+        createdAt:'createdAt',
+        updatedAt:'updatedAt'
+    }
 });
 
 module.exports = mongoose.model('Trade',trade);

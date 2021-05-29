@@ -45,7 +45,7 @@ const fetchReturns = async (req,res) => {
         return res.status(statusCode.OK).json({
             success:true,
             error:false,
-            data:returns
+            data:parseFloat(returns.toFixed(3))
         })
     } catch (error) {
         return res.status(statusCode.INTERNAL_SERVER).json({
@@ -58,8 +58,16 @@ const fetchReturns = async (req,res) => {
 
 const fetchTrades = async (req,res) => {
     try {
+        const portfolio = await Portfolio.findOne();
+        if(!portfolio || portfolio.securities.length === 0) {
+            return res.status(statusCode.OK).json({
+                success:true,
+                error:false,
+                messages:messages.NO_HOLDINGS
+            });
+        }
         const resp = await Trade.aggregate([
-            {$sort:{tradeTime:-1}},
+            {$sort:{createdAt:-1}},
             {
                $group:{
                    _id:'$ticker',
@@ -71,12 +79,16 @@ const fetchTrades = async (req,res) => {
                    'trades._id':1,
                    'trades.quantity':1,
                    'trades.price':1,
-                   'trades.tradeTime':1,
+                   'trades.createdAt':1,
                    'trades.type':1
                 }
             }
         ]);
-        return res.status(statusCode.OK).json(resp);
+        return res.status(statusCode.OK).json({
+            success:true,
+            error:false,
+            data:resp
+        });
     } catch (error) {
         throw new Error(error);
     }
