@@ -206,7 +206,7 @@ const removeTrade = async (req,res) => {
 
         const securityObj = portfolio.securities[index];
         revertTrade(securityObj,tradeToRemove,revertSign);
-        settlePortfolio(portfolio)
+        settlePortfolio(portfolio);
 
         await Promise.all([
             Trade.deleteOne({_id:id}),

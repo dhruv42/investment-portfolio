@@ -58,14 +58,25 @@ const fetchReturns = async (req,res) => {
 
 const fetchTrades = async (req,res) => {
     try {
-        const ticker = req.query.ticker ? req.query.ticker.toUpperCase() : "";
-        const filter = {};
-        if(ticker){
-            filter.ticker=ticker
-        }
-        const allTrades = await Trade.find(filter);
-        console.log(allTrades);
-        res.status(200).json(allTrades);    
+        const resp = await Trade.aggregate([
+            {$sort:{tradeTime:-1}},
+            {
+               $group:{
+                   _id:'$ticker',
+                   trades:{'$push':"$$ROOT"},   
+                }
+            },
+           {
+               $project:{
+                   'trades._id':1,
+                   'trades.quantity':1,
+                   'trades.price':1,
+                   'trades.tradeTime':1,
+                   'trades.type':1
+                }
+            }
+        ]);
+        return res.status(statusCode.OK).json(resp);
     } catch (error) {
         throw new Error(error);
     }

@@ -12,7 +12,7 @@ portfolioRouter.get('/portfolio',get.fetchPortfolio);
 //Update calls
 portfolioRouter.post('/trade',validate('addTradeSchema'),post.addTrade);
 portfolioRouter.put('/trade/:id',validate('updateTradeSchema'),post.updateTrade);
-portfolioRouter.delete('/trade/:id',post.updateTrade);
+portfolioRouter.delete('/trade/:id',post.removeTrade);
 
 
 module.exports = portfolioRouter;
