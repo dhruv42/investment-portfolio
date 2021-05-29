@@ -190,10 +190,10 @@ const updateTrade = async (req,res) => {
 const removeTrade = async (req,res) => {
     try {    
         const id = req.params.id;
-        let tradeToUpdate = await Trade.findById(id).lean();
-        const revertSign =  tradeToUpdate.type === BUY ? -1 : 1;
-        if(!tradeToUpdate) throw new Error('No trade found');
-        const latest = await checkIfTheLatestTrade(tradeToUpdate);
+        const tradeToRemove = await Trade.findById(id).lean();
+        const revertSign =  tradeToRemove.type === BUY ? -1 : 1;
+        if(!tradeToRemove) throw new Error('No trade found');
+        const latest = await checkIfTheLatestTrade(tradeToRemove);
         if(!latest){
             return res.status(statusCode.FORBIDDEN).json({
                 success:false,
@@ -201,12 +201,18 @@ const removeTrade = async (req,res) => {
                 message:messages.MODIFY_LAST_TRADE
             }); 
         }
-        const portfolio = await Portfolio.findById(tradeToUpdate.portfolioId).lean();
-        const index = portfolio.securities.findIndex((s) => s.ticker === tradeToUpdate.ticker);
+        const portfolio = await Portfolio.findById(tradeToRemove.portfolioId).lean();
+        const index = portfolio.securities.findIndex((s) => s.ticker === tradeToRemove.ticker);
 
         const securityObj = portfolio.securities[index];
-        revertTrade(securityObj,tradeToUpdate,revertSign);
+        revertTrade(securityObj,tradeToRemove,revertSign);
         settlePortfolio(portfolio)
+
+        await Promise.all([
+            Trade.deleteOne({_id:id}),
+            Portfolio.updateOne({_id:portfolio._id},portfolio)
+        ]);
+
         return res.status(statusCode.MODIFIED);
 
     } catch (error) {
