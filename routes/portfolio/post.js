@@ -7,17 +7,11 @@ const {
 } = require('../../common/common');
 const {BUY,SELL} = require('../../constants');
 
-const companyNames = {
-    'REL':'Reliance Industries',
-    'WIP':'Wipro pvt ltd',
-    'ITC':'Itc pvt ltd'
-}
-
 const addTrade = async (req,res) => {
     let portfolio;
-    const {price,quantity,type,userId,ticker} = req.body;
+    const {price,quantity,type,ticker} = req.body;
     const tradeSign = type === BUY ? 1 : -1;
-    const userPortfolio = await Portfolio.find({userId});
+    const userPortfolio = await Portfolio.find();
 
     if(userPortfolio.length === 0) {
         if(type === SELL){
@@ -29,12 +23,10 @@ const addTrade = async (req,res) => {
         }
 
         portfolio =  await Portfolio.create({
-            userId,
             totalInvestment:calculateTotalPrice(req.body.price,req.body.quantity),
             returnValue:0,
             returnPercentage:0,
             securities:[{
-                label:companyNames[ticker],
                 ticker,
                 quantity,
                 avgPrice:price,
@@ -69,13 +61,12 @@ const addTrade = async (req,res) => {
         }
 
         const tradePrice = calculateTotalPrice(price,quantity);
-        securityObj.label = companyNames[ticker];
         securityObj.ticker = ticker;
         securityObj.quantity = (securityObj.quantity || 0) + (tradeSign)*quantity ;
         securityObj.totalPrice = (securityObj.totalPrice || 0) + (tradeSign)*calculateTotalPrice(price,quantity);
         securityObj.avgPrice = doAverage(securityObj.totalPrice, securityObj.quantity);
         portfolio.totalInvestment += (tradeSign)*tradePrice;
-        await Portfolio.updateOne({userId},portfolio);
+        await Portfolio.updateOne({_id:portfolio._id},portfolio);
     }
 
     await Trade.create({
@@ -132,7 +123,6 @@ const updateTrade = async (req,res) => {
                 });
             } else { // if one tries to buy then it should be first time buying, we assign all the initial values
                 anotherSecurity.ticker = ticker;
-                anotherSecurity.label = companyNames[ticker];
                 anotherSecurity.quantity = 0;
                 anotherSecurity.totalPrice = 0;
                 otherTickerIndex = portfolio.securities.length;

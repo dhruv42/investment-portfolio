@@ -7,8 +7,7 @@ const allSchemas = {
         type:Joi.string().trim().required().valid(...TRADE_TYPES),
         ticker:Joi.string().trim().required(),
         quantity:Joi.number().required().greater(0),
-        price:Joi.number().required().greater(0),
-        userId:Joi.string().trim().required()
+        price:Joi.number().required().greater(0)
     }),
     updateTradeSchema : Joi.object().keys({
         type:Joi.string().trim().valid(...TRADE_TYPES),

@@ -5,13 +5,12 @@ const {CURRENT_PRICE} = require('../../constants');
 
 const fetchPortfolio = async(req,res) => {
     try {
-        const id = req.query.id;
-        const response = await Portfolio.findById(id,{userId:0});
+        const response = await Portfolio.findOne();
         if(!response) {
             return res.status(statusCode.NOT_FOUND).json({
                 success:false,
                 error:true,
-                messages:`id ${messages.NOT_FOUND}`
+                messages:`portfolio ${messages.NOT_FOUND}`
             })
         }
         return res.status(statusCode.OK).json({
@@ -23,7 +22,7 @@ const fetchPortfolio = async(req,res) => {
         return res.status(statusCode.INTERNAL_SERVER).json({
             success:false,
             error:true,
-            data:`id ${messages.NOT_FOUND}`
+            data:`portfolio ${messages.NOT_FOUND}`
         });
     }
 }
