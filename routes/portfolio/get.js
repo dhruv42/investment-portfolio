@@ -29,8 +29,7 @@ const fetchPortfolio = async(req,res) => {
 
 const fetchReturns = async (req,res) => {
     try {
-        const id = req.query.id;
-        const response = await Portfolio.findById(id);
+        const response = await Portfolio.findOne();
         if(!response) {
             return res.status(statusCode.NOT_FOUND).json({
                 success:false,
