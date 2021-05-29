@@ -34,7 +34,7 @@ const fetchReturns = async (req,res) => {
             return res.status(statusCode.NOT_FOUND).json({
                 success:false,
                 error:true,
-                messages:`id ${messages.NOT_FOUND}`
+                messages:`portfolio ${messages.NOT_FOUND}`
             });
         }
         let returns = 0;
@@ -51,7 +51,7 @@ const fetchReturns = async (req,res) => {
         return res.status(statusCode.INTERNAL_SERVER).json({
             success:false,
             error:true,
-            data:`id ${messages.NOT_FOUND}`
+            data:`portfolio ${messages.NOT_FOUND}`
         });
     }
 }
