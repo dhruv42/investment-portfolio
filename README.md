@@ -11,48 +11,7 @@ You can perform a trade(buy/sell) of security using this API.
 
 **Request:**
 ```json
-POST /api/v1/trade HTTP/1.1
-Content-Type: application/json
-
-{
-    "type": "buy / sell", //required
-    "ticker": "REL", //required
-    "quantity": 2, //required
-    "price":50 //required
-}
-```
-**Successful Response:**
-```json
-HTTP/1.1 200 OK
-Content-Type: application/json
-
-{
-    "success": true,
-    "error": false,
-    "message": "Success"
-}
-```
-**Failed Response:**
-```json
-HTTP/1.1 401 Unauthorized
-Server: My RESTful API
-Content-Type: application/json
-Content-Length: xy
-
-{
-    "code": 120,
-    "message": "invalid crendetials",
-    "resolve": "The username or password is not correct."
-}
-``` 
-
-## Update a trade  
-You can only update latest trade of a security.
-Only the parameter which needs to be updated should be included in the request, request body is same as `Add a trade`.
-
-**Request:**
-```json
-PUT /api/v1/trade/:id HTTP/1.1
+POST /api/v1/trade  HTTP/1.1
 Content-Type: application/json
 
 {
@@ -70,8 +29,37 @@ Content-Type: application/json
 {
     "success": true,
     "error": false,
-    "message": "Success"
+    "message": {
+        "_id" : "60b278d106f9763fe409ccc4",
+        "portfolioId" : "60b278d106f9763fe409ccc3",
+        "type" : "buy",
+        "ticker" : "REL",
+        "quantity" : 2,
+        "price" : 50,
+        "createdAt" : "2021-05-29T22:54:33.702+05:30",
+        "updatedAt" : "2021-05-29T22:54:33.702+05:30"
+    }
 }
+```
+## Update a trade  
+You can only update the latest trade of a security.
+Only the parameter which needs to be updated should be included in the request, request body is same as `Add a trade` API.
+
+**Request:**
+```json
+PUT /api/v1/trade/:id  HTTP/1.1
+Content-Type: application/json
+
+{
+    "type": "buy / sell",
+    "ticker": "REL",
+    "quantity": 2,
+    "price":50
+}
+```
+**Successful Response:**
+```json
+HTTP/1.1 204 No content
 ```
 
 ## Remove a trade  
@@ -79,7 +67,7 @@ You can only remove latest trade of a security, which bring back the security to
 
 **Request:**
 ```json
-DELETE /api/v1/trade/:id HTTP/1.1
+DELETE /api/v1/trade/:id  HTTP/1.1
 ```
 **Successful Response:**
 ```json
@@ -92,7 +80,7 @@ Fetch all the securities and trades correspond to it.
 
 **Request:**
 ```json
-GET /api/v1/trades HTTP/1.1
+GET /api/v1/trades  HTTP/1.1
 Content-Type: application/json
 ```
 **Successful Response:**
@@ -125,7 +113,7 @@ quantity and average buy price
 
 **Request:**
 ```json
-GET /api/v1/portfolio HTTP/1.1
+GET /api/v1/portfolio  HTTP/1.1
 Content-Type: application/json
 ```
 **Successful Response:**
@@ -159,7 +147,7 @@ This API returns sum of returns from all the securities
 
 **Request:**
 ```json
-GET /api/v1/returns HTTP/1.1
+GET /api/v1/returns  HTTP/1.1
 Content-Type: application/json
 ```
 **Successful Response:**

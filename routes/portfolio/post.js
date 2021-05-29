@@ -74,7 +74,7 @@ const addTrade = async (req,res) => {
         await Portfolio.updateOne({_id:portfolio._id},portfolio);
     }
 
-    await Trade.create({
+    const trade = await Trade.create({
         portfolioId:portfolio._id,
         ...req.body
     });
@@ -82,7 +82,7 @@ const addTrade = async (req,res) => {
     return res.status(statusCode.OK).json({
         success:true,
         error:false,
-        message:messages.SUCCESS
+        data:trade
     });
 }
 
@@ -189,11 +189,7 @@ const updateTrade = async (req,res) => {
         Portfolio.updateOne({_id:tradeToUpdate.portfolioId},portfolio)
     ]);
 
-    return res.status(statusCode.OK).json({
-        success:true,
-        error:false,
-        message:messages.SUCCESS
-    });
+    return res.status(statusCode.MODIFIED).json()
 }
 
 const removeTrade = async (req,res) => {
