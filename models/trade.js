@@ -20,6 +20,10 @@ const trade = mongoose.Schema({
     portfolioId:{
         type:String,
         required:true
+    },
+    tradeTime:{
+        type:String,
+        default:new Date().toISOString()
     }
 },{
     versionKey:false

@@ -1,16 +1,21 @@
 {
     "messages":{
+        "SUCCESS":"Success",
         "BAD_REQUEST": "Bad Request",
+        "NOT_FOUND":"Not found",
         "VALIDATION_ERROR": "Validation Error",
         "EVERYTHING_LOOKS_GOOD": "Everything looks good",
         "SOMETHING_WENT_WRONG": "Oops!! Something went wrong",
         "CAN_NOT_SELL_FIRST":"You can not sell before you buy",
         "INVALID_TRADE_TYPE":"Invalid trade type",
         "INVALID_QUANTITY":"Invalid quantity",
-        "PRICE_SHOULD_GREATER_THAN_0":"Price should be greater than zero"
+        "INVALID_TRADE":"Invalid Trade",
+        "PRICE_SHOULD_GREATER_THAN_0":"Price should be greater than zero",
+        "MODIFY_LAST_TRADE":"Can modify only last trade"
     },
     "statusCode": {
         "OK": 200,
+        "MODIFIED":204,
         "BAD_REQUEST": 400,
         "FORBIDDEN": 403,
         "NOT_FOUND": 404,

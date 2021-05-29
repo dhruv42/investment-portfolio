@@ -4,12 +4,15 @@ const get = require('./get');
 const post = require('./post');
 
 // Fetch calls
-portfolioRouter.get('/investments',get.fetchInvestments);
+portfolioRouter.get('/returns',get.fetchReturns);
 portfolioRouter.get('/trades',get.fetchTrades);
+portfolioRouter.get('/portfolio',get.fetchPortfolio);
 
 
 //Update calls
 portfolioRouter.post('/trade',validate('addTradeSchema'),post.addTrade);
+portfolioRouter.put('/trade/:id',validate('updateTradeSchema'),post.updateTrade);
+portfolioRouter.delete('/trade/:id',post.updateTrade);
 
 
 module.exports = portfolioRouter;

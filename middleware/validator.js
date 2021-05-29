@@ -9,6 +9,12 @@ const allSchemas = {
         quantity:Joi.number().required().greater(0),
         price:Joi.number().required().greater(0),
         userId:Joi.string().trim().required()
+    }),
+    updateTradeSchema : Joi.object().keys({
+        type:Joi.string().trim().valid(...TRADE_TYPES),
+        ticker:Joi.string().trim(),
+        quantity:Joi.number().greater(0),
+        price:Joi.number().greater(0)
     })
 }
 
