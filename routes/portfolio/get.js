@@ -5,18 +5,27 @@ const {CURRENT_PRICE} = require('../../constants');
 
 const fetchPortfolio = async(req,res) => {
     try {
-        const response = await Portfolio.findOne();
+        const portfolio = await Portfolio.findOne();
+
         if(!response) {
-            return res.status(statusCode.NOT_FOUND).json({
+            return res.status(statusCode.OK).json({
                 success:false,
                 error:true,
-                messages:`portfolio ${messages.NOT_FOUND}`
-            })
+                messages:messages.NO_HOLDINGS
+            });
+        }
+        portfolio.securities = portfolio.securities.filter((s) => s.quantity > 0);
+        if(!portfolio.securities.length) {
+            return res.status(statusCode.OK).json({
+                success:true,
+                error:false,
+                messages:messages.NO_HOLDINGS
+            });
         }
         return res.status(statusCode.OK).json({
             success:true,
             error:false,
-            data:response
+            data:portfolio
         })
     } catch (error) {
         return res.status(statusCode.INTERNAL_SERVER).json({
