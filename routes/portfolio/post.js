@@ -70,6 +70,7 @@ const addTrade = async (req,res) => {
         } else {
             securityObj.totalPrice = calculateTotalPrice(securityObj.avgPrice,securityObj.quantity);
         }
+        settlePortfolio(portfolio);
         calculateTotalInvestment(portfolio);
         await Portfolio.updateOne({_id:portfolio._id},portfolio);
     }
@@ -90,7 +91,13 @@ const updateTrade = async (req,res) => {
     
     const id = req.params.id;
     let tradeToUpdate = await Trade.findById(id).lean();
-    if(!tradeToUpdate) throw new Error('No trade found');
+    if(!tradeToUpdate) {
+        return res.status(statusCode.NOT_FOUND).json({
+            success:false,
+            error:true,
+            message:messages.INVALID_TRADE
+        });
+    }
     const finalObject = {...tradeToUpdate};
 
     const {price,quantity,ticker,type} = req.body;
@@ -107,6 +114,15 @@ const updateTrade = async (req,res) => {
 
     const portfolio = await Portfolio.findById(tradeToUpdate.portfolioId).lean();
     const index = portfolio.securities.findIndex((s) => s.ticker === tradeToUpdate.ticker);
+
+    if(index<0){
+        return res.status(statusCode.NOT_FOUND).json({
+            success:false,
+            error:true,
+            message:messages.SECURITY_NOT_FOUND
+        });
+    }
+
     const securityObj = portfolio.securities[index];
     let updateSecurity = {...securityObj}; //creating a new secutiy object so we don't lose original security object in case of failure
 
@@ -192,7 +208,13 @@ const removeTrade = async (req,res) => {
         const id = req.params.id;
         const tradeToRemove = await Trade.findById(id).lean();
         const revertSign =  tradeToRemove.type === BUY ? -1 : 1;
-        if(!tradeToRemove) throw new Error('No trade found');
+        if(!tradeToRemove) {
+            return res.status(statusCode.NOT_FOUND).json({
+                success:false,
+                error:true,
+                message:messages.INVALID_TRADE
+            });
+        }
         const latest = await checkIfTheLatestTrade(tradeToRemove);
         if(!latest){
             return res.status(statusCode.FORBIDDEN).json({
@@ -203,6 +225,14 @@ const removeTrade = async (req,res) => {
         }
         const portfolio = await Portfolio.findById(tradeToRemove.portfolioId).lean();
         const index = portfolio.securities.findIndex((s) => s.ticker === tradeToRemove.ticker);
+        
+        if(index<0){
+            return res.status(statusCode.NOT_FOUND).json({
+                success:false,
+                error:true,
+                message:messages.SECURITY_NOT_FOUND
+            });
+        }
 
         const securityObj = portfolio.securities[index];
         revertTrade(securityObj,tradeToRemove,revertSign);

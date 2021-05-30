@@ -12,7 +12,8 @@
         "INVALID_TRADE":"Invalid Trade",
         "PRICE_SHOULD_GREATER_THAN_0":"Price should be greater than zero",
         "MODIFY_LAST_TRADE":"Can modify only last trade",
-        "NO_HOLDINGS":"You do not hold any securities at the moment"
+        "NO_HOLDINGS":"You do not hold any securities at the moment",
+        "SECURITY_NOT_FOUND":"Security not found or you have squared off the position."
     },
     "statusCode": {
         "OK": 200,
