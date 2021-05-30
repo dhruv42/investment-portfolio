@@ -155,30 +155,35 @@ const updateTrade = async (req,res) => {
     // apply updated transaction
     if(Object.keys(anotherSecurity).length){
         anotherSecurity.quantity += (tradeSign)*finalObject.quantity;
-        if(anotherSecurity.quantity < 1) {
+        if(anotherSecurity.quantity < 0) {
             return res.status(statusCode.INTERNAL_SERVER).json({
                 success:false,
                 error:true,
                 message:messages.INVALID_QUANTITY
             });
         }
-        anotherSecurity.totalPrice += (tradeSign)*calculateTotalPrice(finalObject.price,finalObject.quantity);
         if(finalObject.type === BUY){
-            anotherSecurity.avgPrice = doAverage(anotherSecurity.totalPrice,anotherSecurity.quantity);
+            anotherSecurity.totalPrice += (tradeSign)*calculateTotalPrice(finalObject.price,finalObject.quantity);
+            updateSecurity.avgPrice = doAverage(anotherSecurity.totalPrice,anotherSecurity.quantity) || 0;
+        } else {
+            anotherSecurity.totalPrice = calculateTotalPrice(anotherSecurity.avgPrice,anotherSecurity.quantity);
         }
         portfolio.securities[otherTickerIndex] = anotherSecurity;
     } else {
         updateSecurity.quantity += (tradeSign)*finalObject.quantity;
-        if(updateSecurity.quantity < 1) {
+        if(updateSecurity.quantity < 0) {
             return res.status(statusCode.INTERNAL_SERVER).json({
                 success:false,
                 error:true,
                 message:messages.INVALID_QUANTITY
             }); 
         }
-        updateSecurity.totalPrice += (tradeSign)*calculateTotalPrice(finalObject.price,finalObject.quantity);
+        
         if(finalObject.type === BUY){
+            updateSecurity.totalPrice += (tradeSign)*calculateTotalPrice(finalObject.price,finalObject.quantity);
             updateSecurity.avgPrice = doAverage(updateSecurity.totalPrice,updateSecurity.quantity) || 0;
+        } else {
+            updateSecurity.totalPrice = calculateTotalPrice(updateSecurity.avgPrice,updateSecurity.quantity);
         }
     }
     portfolio.securities[index] = updateSecurity;
