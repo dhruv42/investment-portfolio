@@ -39,7 +39,7 @@ const fetchReturns = async (req,res) => {
         }
         let returns = 0;
         response.securities.map((s) => {
-            returns+= CURRENT_PRICE*s.quantity - s.totalPrice
+            returns+= (CURRENT_PRICE-s.avgPrice)*s.quantity
         })
 
         return res.status(statusCode.OK).json({

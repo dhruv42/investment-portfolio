@@ -4,7 +4,7 @@ const {messages,statusCode} = require('../../messages.json');
 const {
     doAverage,calculateTotalPrice,
     checkIfTheLatestTrade,revertTrade,settlePortfolio,
-    calculateTotalInvestment
+    calculateTotalInvestment,settleSecurity
 } = require('../../common/common');
 const {BUY,SELL} = require('../../constants');
 
@@ -162,12 +162,8 @@ const updateTrade = async (req,res) => {
                 message:messages.INVALID_QUANTITY
             });
         }
-        if(finalObject.type === BUY){
-            anotherSecurity.totalPrice += (tradeSign)*calculateTotalPrice(finalObject.price,finalObject.quantity);
-            updateSecurity.avgPrice = doAverage(anotherSecurity.totalPrice,anotherSecurity.quantity) || 0;
-        } else {
-            anotherSecurity.totalPrice = calculateTotalPrice(anotherSecurity.avgPrice,anotherSecurity.quantity);
-        }
+
+        settleSecurity(anotherSecurity,finalObject,tradeSign);
         portfolio.securities[otherTickerIndex] = anotherSecurity;
     } else {
         updateSecurity.quantity += (tradeSign)*finalObject.quantity;
@@ -176,15 +172,9 @@ const updateTrade = async (req,res) => {
                 success:false,
                 error:true,
                 message:messages.INVALID_QUANTITY
-            }); 
+            });
         }
-        
-        if(finalObject.type === BUY){
-            updateSecurity.totalPrice += (tradeSign)*calculateTotalPrice(finalObject.price,finalObject.quantity);
-            updateSecurity.avgPrice = doAverage(updateSecurity.totalPrice,updateSecurity.quantity) || 0;
-        } else {
-            updateSecurity.totalPrice = calculateTotalPrice(updateSecurity.avgPrice,updateSecurity.quantity);
-        }
+        settleSecurity(updateSecurity,finalObject,tradeSign);
     }
     portfolio.securities[index] = updateSecurity;
     settlePortfolio(portfolio);

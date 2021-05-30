@@ -1,3 +1,4 @@
+const { BUY,SELL } = require('../constants');
 const Portfolio = require('../models/portfolio');
 const Trade = require('../models/trade');
 
@@ -32,6 +33,21 @@ function revertTrade(security,modifyingTrade,revertSign){
     }
 }
 
+// we update security based on the trade made.
+function settleSecurity(secutiy,trade,tradeSign) {
+    switch (trade.type) {
+        case BUY:
+            secutiy.totalPrice += (tradeSign)*calculateTotalPrice(trade.price,trade.quantity);
+            secutiy.avgPrice = doAverage(secutiy.totalPrice,secutiy.quantity) || 0;
+            break;
+        case SELL:
+            secutiy.totalPrice = calculateTotalPrice(secutiy.avgPrice,secutiy.quantity);
+            break;
+        default:
+            break;
+    }
+}
+
 
 // remove securities from portfolio having 0 quantity and calculate total investment of the portfolio
 function settlePortfolio(portfolio){
@@ -54,5 +70,6 @@ module.exports = {
     revertTrade,
     checkIfTheLatestTrade,
     settlePortfolio,
-    calculateTotalInvestment
+    calculateTotalInvestment,
+    settleSecurity
 }
