@@ -81,7 +81,7 @@ const fetchTrades = async (req,res) => {
         portfolio.securities.map((s) => {
             if(s.quantity > 0) allSecurities.push(s.ticker);
         });
-        
+
         if(!allSecurities.length) {
             return res.status(statusCode.OK).json({
                 success:true,
@@ -93,7 +93,7 @@ const fetchTrades = async (req,res) => {
         // only fetch those trades which are present in portfolio with quantity greater than 0.
         const resp = await Trade.aggregate([
             {$match:{ticker:{$in:allSecurities}}},
-            {$sort:{createdAt:-1}},
+            {$sort:{_id:-1}},
             {
                $group:{
                    _id:'$ticker',
