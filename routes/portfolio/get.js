@@ -66,7 +66,14 @@ const fetchTrades = async (req,res) => {
                 messages:messages.NO_HOLDINGS
             });
         }
+        const allSecurities = [];
+        portfolio.securities.map((s) => {
+            if(s.quantity > 0) allSecurities.push(s.ticker);
+        });
+
+        // only fetch those trades which are present in portfolio.
         const resp = await Trade.aggregate([
+            {$match:{ticker:{$in:allSecurities}}},
             {$sort:{createdAt:-1}},
             {
                $group:{
