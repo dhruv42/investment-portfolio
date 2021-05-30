@@ -98,7 +98,7 @@ const updateTrade = async (req,res) => {
             message:messages.INVALID_TRADE
         });
     }
-    const finalObject = {...tradeToUpdate};
+    const finalObject = {...tradeToUpdate}; //creating a new trade object so we do not lose old one.
 
     const {price,quantity,ticker,type} = req.body;
     const latest = await checkIfTheLatestTrade(tradeToUpdate);
@@ -115,6 +115,7 @@ const updateTrade = async (req,res) => {
     const portfolio = await Portfolio.findById(tradeToUpdate.portfolioId).lean();
     const index = portfolio.securities.findIndex((s) => s.ticker === tradeToUpdate.ticker);
 
+    // if we do not find the security in portfolio, we return from here.
     if(index<0){
         return res.status(statusCode.NOT_FOUND).json({
             success:false,
@@ -152,9 +153,6 @@ const updateTrade = async (req,res) => {
             anotherSecurity = portfolio.securities[otherTickerIndex];
         }
     }
-    
-    
-
     finalObject.ticker = ticker || tradeToUpdate.ticker;
     finalObject.type = type || tradeToUpdate.type;
     finalObject.quantity = quantity || tradeToUpdate.quantity;
@@ -162,9 +160,8 @@ const updateTrade = async (req,res) => {
 
     const tradeSign = finalObject.type === BUY ? 1 : -1;
 
-    // if our trade type was 'buy', we have to remove the from portfolio, if sell then add trade in portfolio
+    // if our trade type was 'buy', we have to remove from the portfolio, if sell then add trade in portfolio
     const revertSign =  tradeToUpdate.type === BUY ? -1 : 1;
-
     // revert trade in portfolio
     revertTrade(updateSecurity,tradeToUpdate,revertSign);
     
@@ -225,7 +222,7 @@ const removeTrade = async (req,res) => {
         }
         const portfolio = await Portfolio.findById(tradeToRemove.portfolioId).lean();
         const index = portfolio.securities.findIndex((s) => s.ticker === tradeToRemove.ticker);
-        
+
         if(index<0){
             return res.status(statusCode.NOT_FOUND).json({
                 success:false,

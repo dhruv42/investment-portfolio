@@ -1,5 +1,4 @@
 const { BUY,SELL } = require('../constants');
-const Portfolio = require('../models/portfolio');
 const Trade = require('../models/trade');
 
 function calculateTotalPrice(price,quantity) {
