@@ -21,7 +21,6 @@ module.exports = function inputValidator(schemaName){
     return function (req, res, next) {
     const validationResult = allSchemas[schemaName].validate(req.body);
         if (validationResult && validationResult.error) {
-            console.log(validationResult);
             return res.status(statusCode.VALIDATION).json({
                 success:false,
                 error:true,

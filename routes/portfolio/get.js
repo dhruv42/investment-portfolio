@@ -7,7 +7,7 @@ const fetchPortfolio = async(req,res) => {
     try {
         const portfolio = await Portfolio.findOne();
 
-        if(!response) {
+        if(!portfolio) {
             return res.status(statusCode.OK).json({
                 success:false,
                 error:true,
@@ -80,7 +80,7 @@ const fetchTrades = async (req,res) => {
             if(s.quantity > 0) allSecurities.push(s.ticker);
         });
 
-        // only fetch those trades which are present in portfolio.
+        // only fetch those trades which are present in portfolio with quantity greater than 0.
         const resp = await Trade.aggregate([
             {$match:{ticker:{$in:allSecurities}}},
             {$sort:{createdAt:-1}},
