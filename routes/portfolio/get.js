@@ -68,17 +68,27 @@ const fetchReturns = async (req,res) => {
 const fetchTrades = async (req,res) => {
     try {
         const portfolio = await Portfolio.findOne();
-        if(!portfolio || portfolio.securities.length === 0) {
+        const allSecurities = [];
+
+        if(!portfolio) {
             return res.status(statusCode.OK).json({
                 success:true,
                 error:false,
                 messages:messages.NO_HOLDINGS
             });
         }
-        const allSecurities = [];
+        
         portfolio.securities.map((s) => {
             if(s.quantity > 0) allSecurities.push(s.ticker);
         });
+        
+        if(!allSecurities.length) {
+            return res.status(statusCode.OK).json({
+                success:true,
+                error:false,
+                messages:messages.NO_HOLDINGS
+            });
+        }
 
         // only fetch those trades which are present in portfolio with quantity greater than 0.
         const resp = await Trade.aggregate([
